@@ -9,11 +9,11 @@ int main ()
         std::cout << "Error: invalid size\n";
         return EXIT_FAILURE;
     }
-    Matrix<int> matrix { size, size };
+    Matrix<double> matrix { size, size };
 
     matrix>>(std::cin);
 
-    std::cout << matrix.determinant ();
+    std::cout << matrix.determinant () << '\n';
 
     return 0;
 }

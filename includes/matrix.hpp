@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <cmath>
 
 #include "buffer.hpp"
 
@@ -47,7 +48,7 @@ public:
         return *this;
     }
 
-    ~Matrix () { delete data_; }
+    //~Matrix () { delete data_; }
 
 //=========================================================================================================
     int n_cols () const noexcept { return cols_; }
@@ -59,9 +60,10 @@ public:
     {
         if ( rows_ != cols_ ) {
             //throw invalid_argument("Determinant is only defined for square matrices");
+            return 0; // error
         }
 
-        Matrix triangular_matrix = *this;
+        Matrix<double> triangular_matrix = *this;
         double det = 1.0;
 
         for ( int col = 0; col < rows_; col++ ) {
@@ -74,14 +76,14 @@ public:
             }
 
             // Если ведущий элемент равен нулю, определитель матрицы равен нулю
-            if ( std::abs ( triangular_matrix[pivot_row][col] ) < epsilon ) {
+            if ( std::fabs ( triangular_matrix[pivot_row][col] ) < epsilon ) {
                 return 0.0;
             }
 
             // Меняем местами текущую строку и ведущую строку, если они разные
             if ( col != pivot_row ) {
-                std::swap ( triangular_matrix.data_[col], triangular_matrix.data_[pivot_row] );
-                det *= -1;  // Меняем знак определителя при перестановке строк
+                triangular_matrix.swap_rows( col, pivot_row );
+                det *= -1;
             }
 
             det *= triangular_matrix[col][col];
@@ -120,6 +122,20 @@ public:
 
         }
     }*/
+//=========================================================================================================
+
+private:
+    void swap_rows ( int first, int second ) {
+        if ( first == second )
+            return;
+
+        T* first_row  = data_ + first  * cols_;
+        T* second_row = data_ + second * cols_;
+
+        for ( int i = 0; i < cols_; ++i ) {
+            std::swap ( first_row[i], second_row[i] );
+        }
+    }
 
 
 };
