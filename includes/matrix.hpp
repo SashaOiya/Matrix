@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <utility>
 
 #include "buffer.hpp"
 
@@ -21,6 +22,8 @@ class Matrix final: private Buffer<T> {
     };
 
 public:
+    Matrix () : rows_(0), cols_(0), Buffer<T>() {}
+
     Matrix ( size_t n_rows, size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {}
 
     Matrix ( int n_rows, int n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {
@@ -41,16 +44,23 @@ public:
     Matrix& operator= ( const Matrix &rhs )
     {
         Matrix lhs {rhs};
-        copy ( rhs );
+        cols_ = rhs.cols_;
+        rows_ = rhs.rows_;
+        size_ = rhs.size_;
+        data_ = std::exchange ( lhs.data_, nullptr );
 
         return *this;
     }
 
-    Matrix ( Matrix &&rhs ) noexcept { move ( rhs ); }
+    Matrix ( Matrix &&rhs ) noexcept : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_, rhs.cols_ )
+                                     { data_ = std::exchange ( rhs.data_, nullptr ); }
 
     Matrix& operator= ( Matrix &&rhs ) noexcept
     {
-        move ( rhs );
+        rows_ = rhs.rows_;
+        cols_ = rhs.cols_;
+        size_ = rhs.size_;
+        data_ = std::exchange ( rhs.data_, nullptr );
         return *this;
     }
 
@@ -59,7 +69,7 @@ public:
 
     int n_rows () const noexcept { return rows_; }
 
-    size_t size () const noexcept { return size_; }
+    size_t size () const { return size_; }
 
     T* data() const noexcept { return data_; }
 
@@ -162,20 +172,5 @@ private:
             std::swap ( first_row[i], second_row[i] );
         }
     }
-
-    void copy ( Matrix& rhs ) noexcept
-    {
-        rows_ = rhs.rows_;
-        cols_ = rhs.cols_;
-        this->copy ( rhs );
-    }
-
-    void move ( Matrix&& rhs ) noexcept
-    {
-        rows_ = rhs.rows_;
-        cols_ = rhs.cols_;
-        this->move ( rhs );
-    }
-
 
 };
