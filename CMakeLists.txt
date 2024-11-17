@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(GTest REQUIRED)
 enable_testing()
-#add_subdirectory(e2e_tests)
-#add_subdirectory(unit_tests)
+add_subdirectory(e2e_test)
+add_subdirectory(unit_test)
 
 add_executable(matrix ./main.cpp)

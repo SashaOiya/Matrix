@@ -7,35 +7,41 @@
 #include "buffer.hpp"
 
 template<typename T>
-class Matrix final: private Buffer<T> { // privat
-    const double epsilon = 1.0e-7;
-
-    using Buffer<T>::rows_;
-    using Buffer<T>::cols_;
+class Matrix final: private Buffer<T> {
+    const double epsilon = 1.0e-9;
     using Buffer<T>::size_;
     using Buffer<T>::data_;
+    size_t rows_;
+    size_t cols_;
 
-    struct Proxy_Row  {
+    template <typename  U> // *U
+    struct Proxy_Row {
         T *row;
-
-        T& operator[] ( const int j ) noexcept { return row[j]; }
-        const T& operator[] ( const int j ) const noexcept { return row[j]; }
+        U& operator[] ( int j ) noexcept { return row[j]; }
     };
 
 public:
-    Matrix ( int n_rows, int n_cols ) : Buffer<T> ( n_rows, n_cols ) {}
+    Matrix ( size_t n_rows, size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {}
 
-    Matrix ( const Matrix& rhs ) : Buffer<T> ( rhs.rows_, rhs.cols_ )
+    Matrix ( int n_rows, int n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {
+        int i = 0;
+        for ( auto& val : l ) {
+            data_[i] = val;
+            ++i;
+        }
+    }
+
+    Matrix ( const Matrix& rhs ) : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_, rhs.cols_ )
     {
-        for ( int i = 0; i < size_; ++i ) { // iterator
+        for ( size_t i = 0; i < size_; ++i ) {
             data_[i] = rhs.data_[i];
         }
     }
 
-    Matrix& operator= ( Matrix &rhs )
+    Matrix& operator= ( const Matrix &rhs )
     {
         Matrix lhs {rhs};
-        this->move ( lhs );
+        copy ( rhs );
 
         return *this;
     }
@@ -44,16 +50,18 @@ public:
 
     Matrix& operator= ( Matrix &&rhs ) noexcept
     {
-        this->move ( rhs );
+        move ( rhs );
         return *this;
     }
-
-    //~Matrix () { delete data_; }
 
 //=========================================================================================================
     int n_cols () const noexcept { return cols_; }
 
     int n_rows () const noexcept { return rows_; }
+
+    size_t size () const noexcept { return size_; }
+
+    T* data() const noexcept { return data_; }
 
     // Вычисление определителя методом Гаусса
     double determinant() const
@@ -66,10 +74,10 @@ public:
         Matrix<double> triangular_matrix = *this;
         double det = 1.0;
 
-        for ( int col = 0; col < rows_; col++ ) {
+        for ( size_t col = 0; col < rows_; col++ ) {
             // Ищем ведущую строку (pivotRow) для текущего столбца
             int pivot_row = col;
-            for ( int row = col + 1; row < rows_; ++row ) {
+            for ( size_t row = col + 1; row < rows_; ++row ) {
                 if ( std::abs ( triangular_matrix[row][col] ) > std::abs ( triangular_matrix[pivot_row][col] ) ) {
                     pivot_row = row;
                 }
@@ -89,9 +97,9 @@ public:
             det *= triangular_matrix[col][col];
 
             // Обнуляем элементы ниже ведущего элемента в текущем столбце
-            for ( int row = col + 1; row < rows_; ++row ) {
+            for ( size_t row = col + 1; row < rows_; ++row ) {
                 double elimination_factor = triangular_matrix[row][col] / triangular_matrix[col][col];
-                for ( int j = col; j < cols_; ++j ) {
+                for ( size_t j = col; j < cols_; ++j ) {
                     triangular_matrix[row][j] -= elimination_factor * triangular_matrix[col][j];
                 }
             }
@@ -99,10 +107,39 @@ public:
 
         return det;
     }
-//======================================================================================================
-    Proxy_Row operator[] ( const int i ) { return Proxy_Row{ data_ + cols_ * i }; }
 
-    std::istream& operator>> ( std::istream &input_stream ) {
+    Matrix& negate () &
+    {
+        for ( size_t i = 0; i < size_; ++i ) {
+            data_[i] *= -1;
+        }
+        return *this;
+    }
+
+    T trace() const
+    {
+        T result = 0;
+        for ( size_t i = 0; i < rows_; ++i ) {
+            result += data_[i * cols_ + i];
+        }
+        return result;
+    }
+
+    bool equal ( const Matrix& other ) const
+    {
+        if ( rows_ != other.rows_ || cols_ != other.cols_ || size_ != other.size_ ) {
+            return false;
+        }
+        assert ( data_ != nullptr && other.data_ != nullptr  );
+        for ( size_t i = 0; i < size_; ++i ) {
+            if ( data_[i] != other.data_[i] ) { return false; }
+        }
+        return true;
+    }
+//======================================================================================================
+    Proxy_Row<T> operator[] ( const int i ) { return Proxy_Row<T>{ data_ + cols_ * i }; }
+
+    std::istream& operator >> ( std::istream &input_stream ) {
         int size = 0;
         for ( T elem = 0; ( input_stream >>elem)  && size < size_; ++size ) {
             data_[size] = elem;
@@ -111,17 +148,6 @@ public:
 
         return input_stream;
     }
-
-    /*bool equal ( const Matrix& other )
-    {
-        if ( rows_ != other.rows_ || cols_ != other.cols_ || size_ != other.size_ ) {
-            return false;
-        }
-
-        for ( int i = 0; i < size_; ++i ) {
-
-        }
-    }*/
 //=========================================================================================================
 
 private:
@@ -132,9 +158,23 @@ private:
         T* first_row  = data_ + first  * cols_;
         T* second_row = data_ + second * cols_;
 
-        for ( int i = 0; i < cols_; ++i ) {
+        for ( size_t i = 0; i < cols_; ++i ) {
             std::swap ( first_row[i], second_row[i] );
         }
+    }
+
+    void copy ( Matrix& rhs ) noexcept
+    {
+        rows_ = rhs.rows_;
+        cols_ = rhs.cols_;
+        this->copy ( rhs );
+    }
+
+    void move ( Matrix&& rhs ) noexcept
+    {
+        rows_ = rhs.rows_;
+        cols_ = rhs.cols_;
+        this->move ( rhs );
     }
 
 
