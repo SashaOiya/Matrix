@@ -2,7 +2,9 @@
 #include <iostream>
 
 int main ()
+try
 {
+
     using KeyT = double;
 
     int size;
@@ -18,4 +20,9 @@ int main ()
     //printf ( "%f\n", matrix.determinant () );
 
     return 0;
+}
+catch (std::exception& expt)
+{
+    std::cout << expt.what() << std::endl;
+    exit (1);
 }
