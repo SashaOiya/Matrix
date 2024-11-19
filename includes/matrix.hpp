@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <stdexcept>
 #include <utility>
 
 #include "buffer.hpp"
@@ -15,10 +16,11 @@ class Matrix final: private Buffer<T> {
     size_t rows_;
     size_t cols_;
 
-    template <typename  U> // *U
+    template <typename  Ptr_T>
     struct Proxy_Row {
-        T *row;
-        U& operator[] ( int j ) noexcept { return row[j]; }
+        using Data_T = std::remove_pointer_t<Ptr_T>;
+        Ptr_T row;
+        Data_T& operator[] ( int j ) const { return row[j]; }
     };
 
 public:
@@ -71,14 +73,14 @@ public:
 
     size_t size () const { return size_; }
 
-    T* data() const noexcept { return data_; }
+    T* data() noexcept { return data_; }
+    const T* data() const noexcept { return data_; }
 
     // Вычисление определителя методом Гаусса
     double determinant() const
     {
         if ( rows_ != cols_ ) {
-            //throw invalid_argument("Determinant is only defined for square matrices");
-            return 0; // error
+            throw std::runtime_error ( "Determinant is only defined for square matrices" );
         }
 
         Matrix<double> triangular_matrix = *this;
@@ -147,14 +149,14 @@ public:
         return true;
     }
 //======================================================================================================
-    Proxy_Row<T> operator[] ( const int i ) { return Proxy_Row<T>{ data_ + cols_ * i }; }
+    Proxy_Row<T*> operator[] ( const int i ) { return Proxy_Row<T*>{ data_ + cols_ * i }; }
 
     std::istream& operator >> ( std::istream &input_stream ) {
         int size = 0;
         for ( T elem = 0; ( input_stream >>elem)  && size < size_; ++size ) {
             data_[size] = elem;
         }
-        if ( size != size_ ) { throw /**/ ; }
+        if ( size != size_ ) { throw std::runtime_error ( "Invalid number of elements"); }
 
         return input_stream;
     }

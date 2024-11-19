@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <new>
 #include <utility>
 
 template<typename T>
@@ -16,11 +17,11 @@ public :
     Buffer ( const Buffer &buffer ) = delete;
     Buffer& operator= ( const Buffer &buffer ) = delete;
 
-    Buffer ( Buffer &&rhs ) : size_ ( rhs.size_), data_ ( std::move ( rhs.data_ )) {}
+    Buffer ( Buffer &&rhs ) noexcept : size_ ( rhs.size_), data_ ( std::exchange ( rhs.data_, nullptr )) {}
     Buffer& operator= ( Buffer &&rhs ) noexcept
     {
-        size_ = rhs.size_;
-        data_ = std::move ( rhs.data_ );
+        std::swap ( size_, rhs.size_);
+        std::swap ( data_, rhs.data_);
         return *this;
     }
 
@@ -28,9 +29,9 @@ protected:
     size_t size_;
     T*     data_;
 
-    ~Buffer () { delete data_; }
+    ~Buffer () { ::operator delete( data_ ); }
 
-    void copy ( const Buffer &buffer ) noexcept
+    void copy ( const Buffer &buffer )
     {
         size_ = buffer.size_;
         for ( size_t i = 0; i < size_; ++i ) {
