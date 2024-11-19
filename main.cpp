@@ -14,7 +14,7 @@ try
         return EXIT_FAILURE;
     }
     Matrix<KeyT> matrix { static_cast<size_t>(size), static_cast<size_t>(size) };
-    matrix >> ( std::cin );
+    std::cin >> matrix;
 
     std::cout  << matrix.determinant () << '\n';
     //printf ( "%f\n", matrix.determinant () );

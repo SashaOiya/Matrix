@@ -38,9 +38,7 @@ public:
 
     Matrix ( const Matrix& rhs ) : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_, rhs.cols_ )
     {
-        for ( size_t i = 0; i < size_; ++i ) {
-            data_[i] = rhs.data_[i];
-        }
+        std::copy ( rhs.data_, rhs.data_ + rhs.size_, data_ );
     }
 
     Matrix& operator= ( const Matrix &rhs )
@@ -62,16 +60,18 @@ public:
         rows_ = rhs.rows_;
         cols_ = rhs.cols_;
         size_ = rhs.size_;
-        data_ = std::exchange ( rhs.data_, nullptr );
+        std::swap ( data_, rhs.data_ );
         return *this;
     }
 
 //=========================================================================================================
+    Proxy_Row<T*> operator[] ( const int i ) { return Proxy_Row<T*>{ data_ + cols_ * i }; }
+
     int n_cols () const noexcept { return cols_; }
 
     int n_rows () const noexcept { return rows_; }
 
-    size_t size () const { return size_; }
+    size_t size () const noexcept { return size_; }
 
     T* data() noexcept { return data_; }
     const T* data() const noexcept { return data_; }
@@ -148,19 +148,6 @@ public:
         }
         return true;
     }
-//======================================================================================================
-    Proxy_Row<T*> operator[] ( const int i ) { return Proxy_Row<T*>{ data_ + cols_ * i }; }
-
-    std::istream& operator >> ( std::istream &input_stream ) {
-        int size = 0;
-        for ( T elem = 0; ( input_stream >>elem)  && size < size_; ++size ) {
-            data_[size] = elem;
-        }
-        if ( size != size_ ) { throw std::runtime_error ( "Invalid number of elements"); }
-
-        return input_stream;
-    }
-//=========================================================================================================
 
 private:
     void swap_rows ( int first, int second ) {
@@ -176,3 +163,17 @@ private:
     }
 
 };
+
+template<typename T>
+std::istream& operator>> ( std::istream &input_stream, Matrix<T> &matrix )
+{
+    int size = 0;
+    int size_ = matrix.size();
+    auto data_ = matrix.data();
+    for ( T elem = 0; ( input_stream >>elem)  && size < size_; ++size ) {
+        data_[size] = elem;
+    }
+    if ( size != size_ ) { throw std::runtime_error ( "Invalid number of elements"); }
+
+    return input_stream;
+}
