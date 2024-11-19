@@ -23,7 +23,7 @@ namespace test_funcs
         }
         Matrix<double> matrix { static_cast<size_t>(size), static_cast<size_t>(size) };
 
-        matrix >> ( file );
+        file >> matrix;//matrix >> ( file );
 
         return matrix.determinant();
     }

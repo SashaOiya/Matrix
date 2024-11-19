@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <new>
 #include <utility>
+#include <algorithm>
 
 template<typename T>
 class Buffer
@@ -30,12 +31,4 @@ protected:
     T*     data_;
 
     ~Buffer () { ::operator delete( data_ ); }
-
-    void copy ( const Buffer &buffer )
-    {
-        size_ = buffer.size_;
-        for ( size_t i = 0; i < size_; ++i ) {
-            data_[i] = buffer.data_[i];
-        }
-    }
 };
