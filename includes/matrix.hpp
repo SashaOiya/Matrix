@@ -13,23 +13,22 @@ class Matrix final: private Buffer<T> {
     const double epsilon = 1.0e-9;
     using Buffer<T>::size_;
     using Buffer<T>::data_;
-    size_t rows_;
-    size_t cols_;
+    std::size_t rows_;
+    std::size_t cols_;
 
-    template <typename  Ptr_T>
+    template <typename  Data_t>
     struct Proxy_Row {
-        using Data_T = std::remove_pointer_t<Ptr_T>;
-        Ptr_T row;
-        Data_T& operator[] ( int j ) const { return row[j]; }
+        Data_t* row;
+        Data_t& operator[] ( std::size_t j ) const { return row[j]; }
     };
 
 public:
     Matrix () : rows_(0), cols_(0), Buffer<T>() {}
 
-    Matrix ( size_t n_rows, size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {}
+    Matrix ( std::size_t n_rows, std::size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {}
 
-    Matrix ( int n_rows, int n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {
-        int i = 0;
+    Matrix ( std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {
+        std::size_t i = 0;
         for ( auto& val : l ) {
             data_[i] = val;
             ++i;
@@ -65,7 +64,7 @@ public:
     }
 
 //=========================================================================================================
-    Proxy_Row<T*> operator[] ( const int i ) { return Proxy_Row<T*>{ data_ + cols_ * i }; }
+    Proxy_Row<T> operator[] ( const std::size_t i ) { return Proxy_Row<T>{ data_ + cols_ * i }; }
 
     int n_cols () const noexcept { return cols_; }
 
@@ -86,10 +85,10 @@ public:
         Matrix<double> triangular_matrix = *this;
         double det = 1.0;
 
-        for ( size_t col = 0; col < rows_; col++ ) {
+        for ( std::size_t col = 0; col < rows_; col++ ) {
             // Ищем ведущую строку (pivotRow) для текущего столбца
             int pivot_row = col;
-            for ( size_t row = col + 1; row < rows_; ++row ) {
+            for ( std::size_t row = col + 1; row < rows_; ++row ) {
                 if ( std::abs ( triangular_matrix[row][col] ) > std::abs ( triangular_matrix[pivot_row][col] ) ) {
                     pivot_row = row;
                 }
@@ -109,9 +108,9 @@ public:
             det *= triangular_matrix[col][col];
 
             // Обнуляем элементы ниже ведущего элемента в текущем столбце
-            for ( size_t row = col + 1; row < rows_; ++row ) {
+            for ( std::size_t row = col + 1; row < rows_; ++row ) {
                 double elimination_factor = triangular_matrix[row][col] / triangular_matrix[col][col];
-                for ( size_t j = col; j < cols_; ++j ) {
+                for ( std::size_t j = col; j < cols_; ++j ) {
                     triangular_matrix[row][j] -= elimination_factor * triangular_matrix[col][j];
                 }
             }
@@ -122,7 +121,7 @@ public:
 
     Matrix& negate () &
     {
-        for ( size_t i = 0; i < size_; ++i ) {
+        for ( std::size_t i = 0; i < size_; ++i ) {
             data_[i] *= -1;
         }
         return *this;
@@ -131,7 +130,7 @@ public:
     T trace() const
     {
         T result = 0;
-        for ( size_t i = 0; i < rows_; ++i ) {
+        for ( std::size_t i = 0; i < rows_; ++i ) {
             result += data_[i * cols_ + i];
         }
         return result;
@@ -143,21 +142,21 @@ public:
             return false;
         }
         assert ( data_ != nullptr && other.data_ != nullptr  );
-        for ( size_t i = 0; i < size_; ++i ) {
+        for ( std::size_t i = 0; i < size_; ++i ) {
             if ( data_[i] != other.data_[i] ) { return false; }
         }
         return true;
     }
 
 private:
-    void swap_rows ( int first, int second ) {
+    void swap_rows ( std::size_t first, std::size_t second ) {
         if ( first == second )
             return;
 
         T* first_row  = data_ + first  * cols_;
         T* second_row = data_ + second * cols_;
 
-        for ( size_t i = 0; i < cols_; ++i ) {
+        for ( std::size_t i = 0; i < cols_; ++i ) {
             std::swap ( first_row[i], second_row[i] );
         }
     }

@@ -1,19 +1,18 @@
 #include "includes/matrix.hpp"
+#include <cstdlib>
 #include <iostream>
 
-int main ()
-try
+int main () try
 {
-
     using KeyT = double;
 
     int size;
     std::cin >> size;
     if ( size <= 0 ) {
-        std::cout << "Error: invalid size\n";
+        std::cerr << "Error: invalid size\n";
         return EXIT_FAILURE;
     }
-    Matrix<KeyT> matrix { static_cast<size_t>(size), static_cast<size_t>(size) };
+    Matrix<KeyT> matrix { static_cast<std::size_t>(size), static_cast<std::size_t>(size) };
     std::cin >> matrix;
 
     std::cout  << matrix.determinant () << '\n';
@@ -21,8 +20,8 @@ try
 
     return 0;
 }
-catch (std::exception& expt)
+catch (const std::exception& expt)
 {
-    std::cout << expt.what() << std::endl;
-    exit (1);
+    std::cerr << expt.what() << std::endl;
+    return EXIT_FAILURE;
 }
