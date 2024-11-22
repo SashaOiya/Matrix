@@ -10,9 +10,9 @@ class Buffer
 {
 public :
     Buffer () : size_(0), data_(nullptr) {}
-    Buffer ( int n_rows, int n_cols) : size_(n_rows * n_cols)
+    Buffer ( std::size_t n_rows, std::size_t n_cols) : size_(n_rows * n_cols)
     {
-        data_ = static_cast<T *>( ::operator new ( size_ * sizeof (T) ) );
+        data_ = ( size_ == 0 ) ? nullptr : static_cast<T *>( ::operator new ( size_ * sizeof (T) ) );
     }
 
     Buffer ( const Buffer &buffer ) = delete;
@@ -27,7 +27,7 @@ public :
     }
 
 protected:
-    size_t size_;
+    std::size_t size_;
     T*     data_;
 
     ~Buffer () { ::operator delete( data_ ); }
