@@ -25,9 +25,12 @@ class Matrix final: private Buffer<T> {
 public:
     Matrix () : rows_(0), cols_(0), Buffer<T>() {}
 
-    Matrix ( std::size_t n_rows, std::size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {}
+    Matrix ( std::size_t n_rows, std::size_t n_cols ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows * n_cols )
+    {
+        data_ = new (data_) T;
+    }
 
-    Matrix ( std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows, n_cols ) {
+    Matrix ( std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l ) : rows_(n_rows), cols_(n_cols), Buffer<T> ( n_rows * n_cols ) {
         std::size_t i = 0;
         for ( auto& val : l ) {
             data_[i] = val;
@@ -35,7 +38,7 @@ public:
         }
     }
 
-    Matrix ( const Matrix& rhs ) : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_, rhs.cols_ )
+    Matrix ( const Matrix& rhs ) : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_ * rhs.cols_ )
     {
         std::copy ( rhs.data_, rhs.data_ + rhs.size_, data_ );
     }
@@ -51,7 +54,7 @@ public:
         return *this;
     }
 
-    Matrix ( Matrix &&rhs ) noexcept : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_, rhs.cols_ )
+    Matrix ( Matrix &&rhs ) noexcept : rows_(rhs.rows_), cols_(rhs.cols_), Buffer<T> ( rhs.rows_ * rhs.cols_ )
                                      { data_ = std::exchange ( rhs.data_, nullptr ); }
 
     Matrix& operator= ( Matrix &&rhs ) noexcept
@@ -169,7 +172,7 @@ std::istream& operator>> ( std::istream &input_stream, Matrix<T> &matrix )
     int size = 0;
     int size_ = matrix.size();
     auto data_ = matrix.data();
-    for ( T elem = 0; ( input_stream >>elem)  && size < size_; ++size ) {
+    for ( T elem = 0; ( size < size_) && ( input_stream >> elem ); ++size ) {
         data_[size] = elem;
     }
     if ( size != size_ ) { throw std::runtime_error ( "Invalid number of elements"); }

@@ -12,7 +12,7 @@ set_target_properties(matrix_e2e_test PROPERTIES
 target_compile_definitions(matrix_e2e_test PUBLIC
 						   -DTEST_DATA_DIR="${TEST_DATA_DIR}")
 
-target_link_libraries(matrix_e2e_test PRIVATE
+target_link_libraries(matrix_e2e_test PUBLIC
 					  GTest::GTest
 					  GTest::gtest_main)
 

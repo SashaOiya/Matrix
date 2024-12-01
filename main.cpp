@@ -1,6 +1,7 @@
 #include "includes/matrix.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 
 int main () try
 {
@@ -8,15 +9,12 @@ int main () try
 
     int size;
     std::cin >> size;
-    if ( size <= 0 ) {
-        std::cerr << "Error: invalid size\n";
-        return EXIT_FAILURE;
-    }
+    if ( size <= 0 ) { throw std::runtime_error ( "Error: invalid size\n" ); }
+
     Matrix<KeyT> matrix { static_cast<std::size_t>(size), static_cast<std::size_t>(size) };
     std::cin >> matrix;
 
     std::cout  << matrix.determinant () << '\n';
-    //printf ( "%f\n", matrix.determinant () );
 
     return 0;
 }
