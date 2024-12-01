@@ -10,7 +10,7 @@ class Buffer
 {
 public :
     Buffer () : size_(0), data_(nullptr) {}
-    Buffer ( std::size_t n_rows, std::size_t n_cols) : size_(n_rows * n_cols)
+    Buffer ( std::size_t size ) : size_(size)
     {
         data_ = ( size_ == 0 ) ? nullptr : static_cast<T *>( ::operator new ( size_ * sizeof (T) ) );
     }
