@@ -11,7 +11,7 @@
 
 template<typename T>
 class Matrix final: private Buffer<T> {
-    const double epsilon = 1.0e-9;
+    static const double epsilon = 1.0e-9;
     using Buffer<T>::size_;
     using Buffer<T>::data_;
     std::size_t rows_;
