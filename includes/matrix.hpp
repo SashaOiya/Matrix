@@ -5,6 +5,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <utility>
+#include <algorithm>
 
 #include "buffer.hpp"
 
@@ -144,24 +145,19 @@ public:
         if ( rows_ != other.rows_ || cols_ != other.cols_ || size_ != other.size_ ) {
             return false;
         }
-        assert ( data_ != nullptr && other.data_ != nullptr  );
-        for ( std::size_t i = 0; i < size_; ++i ) {
-            if ( data_[i] != other.data_[i] ) { return false; }
-        }
-        return true;
+        return std::equal ( data_, data_ + size_, other.data_ );
     }
 
 private:
-    void swap_rows ( std::size_t first, std::size_t second ) {
+    void swap_rows ( std::size_t first, std::size_t second ) 
+    {
         if ( first == second )
             return;
 
         T* first_row  = data_ + first  * cols_;
         T* second_row = data_ + second * cols_;
 
-        for ( std::size_t i = 0; i < cols_; ++i ) {
-            std::swap ( first_row[i], second_row[i] );
-        }
+        std::swap_ranges ( first_row, first_row + cols_, second_row );
     }
 
 };
