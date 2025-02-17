@@ -73,3 +73,19 @@ TEST ( test5, test5_unit )
 
     EXPECT_TRUE(matrix.equal ( lhs ));
 }
+
+TEST ( test6, test6_unit )
+{
+	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
+	Matrix<double> matrix_2 = matrix;
+
+    EXPECT_TRUE(matrix.equal ( matrix_2 ));
+}
+
+TEST ( test7, test7_unit )
+{
+	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
+	Matrix<double> matrix_2 = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, 10 } };
+
+    EXPECT_FALSE(matrix.equal ( matrix_2 ));
+}
