@@ -3,12 +3,6 @@ add_executable(matrix_unit_test
 
 set(TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 
-set_target_properties(matrix_unit_test PROPERTIES
-	CXX_STANDARD 20
-	CXX_STANDARD_REQUIRED ON
-	CXX_EXTENSIONS OFF
-)
-
 target_compile_definitions(matrix_unit_test PUBLIC
 						   -DTEST_DATA_DIR="${TEST_DATA_DIR}")
 

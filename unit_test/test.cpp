@@ -1,91 +1,73 @@
 #include <gtest/gtest.h>
+
 #include "matrix.hpp"
 
-TEST ( test1, test1_unit )
-{
-	Matrix<double> matrix = { 3, 3, {1, 2, 3, 4, 6, 7, 8, 12, 1}};
-	Matrix<double> lhs = matrix;
+TEST(test1, test1_matrix_copy_ctor) {
+    Matrix<double> matrix = {3, 3, {1, 2, 3, 4, 6, 7, 8, 12, 1}};
+    Matrix<double> lhs = matrix;
 
-	EXPECT_TRUE ( matrix.size() == lhs.size() );
-	size_t size = matrix.size();
-	for ( size_t i = 0; i < size; ++i ) {
-		EXPECT_EQ ( matrix.data()[i] , lhs.data()[i] );
-	}
+    EXPECT_TRUE(matrix.size() == lhs.size());
+    auto cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
+    for (size_t i = 0; i < cols_; ++i)
+        for (auto j = 0; j < rows_; ++j) EXPECT_EQ(matrix[i][j], lhs[i][j]);
 }
 
-TEST ( test2, test2_unit )
-{
-	Matrix<double> matrix = { 2, 2, { 2, 3, 5, 6 } };
+TEST(test2, test2_matrix_copy_ctor) {
+    Matrix<double> matrix = {2, 2, {2, 3, 5, 6}};
 
-	Matrix<double> lhs = {};
-	lhs = matrix;
+    Matrix<double> lhs = {};
+    lhs = matrix;
 
-	EXPECT_TRUE( matrix.size() == lhs.size() );
-	size_t size = matrix.size();
-	for ( size_t i = 0; i < size; ++i ) {
-		EXPECT_EQ ( matrix.data()[i] , lhs.data()[i] );
-	}
+    EXPECT_TRUE(matrix.size() == lhs.size());
+    auto cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
+    for (size_t i = 0; i < cols_; ++i)
+        for (auto j = 0; j < rows_; ++j) EXPECT_EQ(matrix[i][j], lhs[i][j]);
 }
 
-TEST ( test3, test3_unit )
-{
-	Matrix<double> matrix = { 3, 3, {-4, 9, 6, 4, -11, 0, 7, 4, 5} };
+TEST(test3, test_matrix_move_ctor) {
+    Matrix<double> matrix = {3, 3, {-4, 9, 6, 4, -11, 0, 7, 4, 5}};
 
-	std::vector<double> data = {};
-    size_t matrix_size = matrix.size();
-	for ( size_t i = 0; i < matrix_size; ++i ) {
-		data.push_back ( matrix.data()[i] );
-	}
+    std::vector<std::vector<double>> data = {};
+    const int cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
+    for (size_t i = 0; i < cols_; ++i) {
+        std::vector<double> row = {};
+        for (auto j = 0; j < rows_; ++j) row.push_back(matrix[i][j]);
+        data.push_back(row);
+    }
+    Matrix<double> lhs = std::move(matrix);
 
-	Matrix<double> lhs = std::move ( matrix );
-
-	EXPECT_TRUE ( data.size() == lhs.size() );
-    size_t size = data.size();
-	for ( size_t i = 0; i < size; ++i ) {
-		EXPECT_EQ ( data[i] , lhs.data()[i] );
-	}
+    for (size_t i = 0; i < cols_; ++i)
+        for (auto j = 0; j < rows_; ++j) EXPECT_EQ(data[i][j], lhs[i][j]);
 }
 
-TEST ( test4, test4_unit )
-{
-	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
+TEST(test4, test_matrix_move_assignment) {
+    Matrix<double> matrix = {3, 3, {5, 8, 9, 12, 3, -4, 67, 18, -5}};
 
-	std::vector<double> data = {};
-	size_t matrix_size = matrix.size();
-	for ( size_t i = 0; i < matrix_size; ++i ) {
-		data.push_back ( matrix.data()[i] );
-	}
+    std::vector<std::vector<double>> data = {};
+    const int cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
+    for (size_t i = 0; i < cols_; ++i) {
+        std::vector<double> row = {};
+        for (auto j = 0; j < rows_; ++j) row.push_back(matrix[i][j]);
+        data.push_back(row);
+    }
 
-	Matrix<double> lhs = {};
-	lhs = std::move ( matrix );
+    Matrix<double> lhs = {};
+    lhs = std::move(matrix);
 
-	EXPECT_TRUE(data.size() == lhs.size());
-	size_t size = data.size();
-	for ( size_t i = 0; i < size; ++i ) {
-		EXPECT_EQ ( data[i] , lhs.data()[i] );
-	}
+    for (size_t i = 0; i < cols_; ++i)
+        for (auto j = 0; j < rows_; ++j) EXPECT_EQ(data[i][j], lhs[i][j]);
 }
 
-TEST ( test5, test5_unit )
-{
-	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
-	Matrix<double> lhs = matrix;
+TEST(test5, test_matrix_equal_true) {
+    Matrix<double> matrix = {3, 3, {5, 8, 9, 12, 3, -4, 67, 18, -5}};
+    Matrix<double> lhs = matrix;
 
-    EXPECT_TRUE(matrix.equal ( lhs ));
+    EXPECT_TRUE(matrix.equal(lhs));
 }
 
-TEST ( test6, test6_unit )
-{
-	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
-	Matrix<double> matrix_2 = matrix;
+TEST(test7, test_matrix_equal_true) {
+    Matrix<double> matrix = {3, 3, {5, 8, 9, 12, 3, -4, 67, 18, -5}};
+    Matrix<double> matrix_2 = {3, 3, {5, 8, 9, 12, 3, -4, 67, 18, 10}};
 
-    EXPECT_TRUE(matrix.equal ( matrix_2 ));
-}
-
-TEST ( test7, test7_unit )
-{
-	Matrix<double> matrix = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, -5 } };
-	Matrix<double> matrix_2 = { 3, 3, { 5, 8, 9, 12, 3, -4, 67, 18, 10 } };
-
-    EXPECT_FALSE(matrix.equal ( matrix_2 ));
+    EXPECT_FALSE(matrix.equal(matrix_2));
 }
