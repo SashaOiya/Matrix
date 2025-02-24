@@ -29,9 +29,7 @@ class Matrix final : private Buffer<T> {
     Matrix() : rows_(0), cols_(0), Buffer<T>() {}
 
     Matrix(std::size_t n_rows, std::size_t n_cols)
-        : rows_(n_rows), cols_(n_cols), Buffer<T>(n_rows * n_cols) {
-        data_ = new (data_) T;
-    }
+        : rows_(n_rows), cols_(n_cols), Buffer<T>(n_rows * n_cols) {}
 
     Matrix(std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l)
         : rows_(n_rows), cols_(n_cols), Buffer<T>(n_rows * n_cols) {

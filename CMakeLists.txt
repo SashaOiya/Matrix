@@ -14,3 +14,4 @@ add_subdirectory(e2e_test)
 add_subdirectory(unit_test)
 
 add_executable(matrix ./main.cpp)
+target_include_directories(matrix PRIVATE ${CMAKE_SOURCE_DIR}/includes)
