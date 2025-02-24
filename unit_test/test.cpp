@@ -2,7 +2,7 @@
 
 #include "matrix.hpp"
 
-TEST(test1, test1_matrix_copy_ctor) {
+TEST(matrix, copy_ctor) {
     Matrix<double> matrix = {3, 3, {1, 2, 3, 4, 6, 7, 8, 12, 1}};
     Matrix<double> lhs = matrix;
 
@@ -12,7 +12,7 @@ TEST(test1, test1_matrix_copy_ctor) {
         for (auto j = 0; j < rows_; ++j) EXPECT_EQ(matrix[i][j], lhs[i][j]);
 }
 
-TEST(test2, test2_matrix_copy_ctor) {
+TEST(matrix, copy_assignment) {
     Matrix<double> matrix = {2, 2, {2, 3, 5, 6}};
 
     Matrix<double> lhs = {};
@@ -24,7 +24,7 @@ TEST(test2, test2_matrix_copy_ctor) {
         for (auto j = 0; j < rows_; ++j) EXPECT_EQ(matrix[i][j], lhs[i][j]);
 }
 
-TEST(test3, test_matrix_move_ctor) {
+TEST(matrix, move_ctor) {
     Matrix<double> matrix = {3, 3, {-4, 9, 6, 4, -11, 0, 7, 4, 5}};
 
     std::vector<std::vector<double>> data = {};
@@ -40,7 +40,7 @@ TEST(test3, test_matrix_move_ctor) {
         for (auto j = 0; j < rows_; ++j) EXPECT_EQ(data[i][j], lhs[i][j]);
 }
 
-TEST(test4, test_matrix_move_assignment) {
+TEST(matrix, move_assignment) {
     Matrix<double> matrix = {3, 3, {5, 8, 9, 12, 3, -4, 67, 18, -5}};
 
     std::vector<std::vector<double>> data = {};
