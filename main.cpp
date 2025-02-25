@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <iostream>
-#include <stdexcept>
+#include <exception>
 #include <vector>
 
 #include "matrix.hpp"
