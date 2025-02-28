@@ -22,23 +22,23 @@ class Buffer {
 	Buffer &operator=(const Buffer &buffer) = delete;
 
 	Buffer(Buffer &&rhs) noexcept
-		: capacity_(std::exchange(rhs.capacity_, 0)),
-		  data_(std::exchange(rhs.data_, nullptr)),
-		  size_(std::exchange(rhs.size_, 0)) {
+		:capacity_(std::exchange(rhs.capacity_, 0)), 
+		size_(std::exchange(rhs.size_, 0)),
+		data_(std::exchange(rhs.data_, nullptr)) {
 	}
 	Buffer &operator=(Buffer &&rhs) noexcept {
 		swap(rhs);
 		return *this;
 	}
 
-	void swap(Buffer &rhs) {
+	void swap(Buffer &rhs) noexcept {
 		std::swap(size_, rhs.size_);
 		std::swap(capacity_, rhs.capacity_);
 		std::swap(data_, rhs.data_);
 	}
 
    protected:
-	std::size_t capacity_ = 0;
+	std::size_t capacity_ ;
 	std::size_t size_ = 0;
 	T *data_;
 
@@ -77,8 +77,8 @@ class Array : private Buffer<T> {
 	}
 
 	Array &operator=(const Array &rhs) {
-		Array<T> lhs{rhs};
-		this->swap(lhs);
+		Array lhs{rhs};
+		swap(lhs);
 
 		return *this;
 	}
@@ -92,7 +92,7 @@ class Array : private Buffer<T> {
 	T &operator[](size_type i) {
 		return data_[i];
 	}
-	const size_type size() const {
+	size_type size() const noexcept {
 		return size_;
 	}
 };
