@@ -1,7 +1,5 @@
-#include <cstdlib>
-#include <iostream>
 #include <exception>
-#include <vector>
+#include <iostream>
 
 #include "matrix.hpp"
 
@@ -11,7 +9,7 @@ int main() try {
 	std::size_t size;
 	std::cin >> size;
 	if (!std::cin.good()) {
-		throw std::runtime_error("Invalid size\n");
+		throw std::runtime_error("Invalid size");
 	}
 
 	Matrix<KeyT> matrix{size, size};

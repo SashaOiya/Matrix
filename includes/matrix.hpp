@@ -1,15 +1,13 @@
 #pragma once
 
-#include <algorithm>
 #include <cmath>
-#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <utility>
 
 #include "buffer.hpp"
 
 template <typename T>
+	requires std::is_same_v<T, double>
 class Matrix final : private Array<T> {
 	static constexpr double kEpsilon = 1.0e-9;
 	using Array<T>::data_;
@@ -34,17 +32,17 @@ class Matrix final : private Array<T> {
 
 	Matrix(std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l)
 		: Array<T>(n_rows * n_cols), rows_(n_rows), cols_(n_cols) {
-		if (l.size() != size() ) {
+		if (l.size() != size()) {
 			throw std::invalid_argument("Incorrect initializer list size");
 		}
 		std::copy(l.begin(), l.end(), data_);
 	}
 
 	//=========================================================================================================
-	Proxy_Row<T> operator[](const std::size_t i) {
+	Proxy_Row<T> operator[](size_type i) {
 		return Proxy_Row<T>{data_ + cols_ * i};
 	}
-	Proxy_Row<const T> operator[](const std::size_t i) const {
+	Proxy_Row<const T> operator[](size_type i) const {
 		return Proxy_Row<const T>{data_ + cols_ * i};
 	}
 
@@ -85,7 +83,7 @@ class Matrix final : private Array<T> {
 			det *= triangular_matrix[col][col];
 
 			for (std::size_t row = col + 1; row < rows_; ++row) {
-				 double elimination_factor =
+				double elimination_factor =
 					triangular_matrix[row][col] / triangular_matrix[col][col];
 				for (std::size_t j = col; j < cols_; ++j) {
 					triangular_matrix[row][j] -= elimination_factor * triangular_matrix[col][j];
@@ -97,8 +95,9 @@ class Matrix final : private Array<T> {
 	}
 
 	Matrix& negate() & {
-		for (auto &val : *this) {
-			val = -val;
+		auto size = size();
+		for (std::size_t i = 0; i < size; ++i) {
+			data_[i] *= -1;
 		}
 		return *this;
 	}
@@ -112,7 +111,7 @@ class Matrix final : private Array<T> {
 	}
 
 	bool equal(const Matrix& other) const {
-		if ( size() != other.size()) {
+		if (size() != other.size()) {
 			return false;
 		}
 		return std::equal(data_, data_ + size(), other.data_);
@@ -131,10 +130,10 @@ class Matrix final : private Array<T> {
 
 template <typename T>
 std::istream& operator>>(std::istream& input_stream, Matrix<T>& matrix) {
-	int col = 0, size = 0;
-	auto cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
+	std::size_t col = 0, size = 0;
+	const std::size_t cols_ = matrix.n_cols(), rows_ = matrix.n_rows();
 	for (T elem = 0; col < cols_; ++col) {
-		for (int row = 0; (row < rows_) && (input_stream >> elem); ++row, ++size) {
+		for (std::size_t row = 0; (row < rows_) && (input_stream >> elem); ++row, ++size) {
 			if (!std::cin.good()) {
 				throw std::runtime_error("Invalid input");
 			}

@@ -18,13 +18,13 @@ class Buffer {
 								 : static_cast<T *>(::operator new(capacity_ * sizeof(T)))) {
 	}
 
-	Buffer(const Buffer &buffer) = delete;
-	Buffer &operator=(const Buffer &buffer) = delete;
+	Buffer(const Buffer &) = delete;
+	Buffer &operator=(const Buffer &) = delete;
 
 	Buffer(Buffer &&rhs) noexcept
-		:capacity_(std::exchange(rhs.capacity_, 0)), 
-		size_(std::exchange(rhs.size_, 0)),
-		data_(std::exchange(rhs.data_, nullptr)) {
+		: capacity_(std::exchange(rhs.capacity_, 0)),
+		  size_(std::exchange(rhs.size_, 0)),
+		  data_(std::exchange(rhs.data_, nullptr)) {
 	}
 	Buffer &operator=(Buffer &&rhs) noexcept {
 		swap(rhs);
@@ -38,7 +38,7 @@ class Buffer {
 	}
 
    protected:
-	std::size_t capacity_ ;
+	std::size_t capacity_;
 	std::size_t size_ = 0;
 	T *data_;
 
@@ -83,8 +83,8 @@ class Array : private Buffer<T> {
 		return *this;
 	}
 
-	Array(Array &&rhs) = default;
-	Array &operator=(Array &&rhs) = default;
+	Array(Array &&) = default;
+	Array &operator=(Array &&) = default;
 
 	const T &operator[](size_type i) const {
 		return data_[i];

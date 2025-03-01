@@ -1,5 +1,5 @@
 add_executable(matrix_unit_test
-			   test.cpp)
+			   array_test.cpp matrix_test.cpp)
 
 target_link_libraries(matrix_unit_test 
 PRIVATE
