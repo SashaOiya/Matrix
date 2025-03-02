@@ -43,7 +43,7 @@ for file in "${files[@]}"; do
     # Вычисление разницы и сравнение с epsilon
     difference=$(awk -v r="$result" -v e="$expected" 'BEGIN { print (r - e) < 0 ? -(r - e) : (r - e) }')
 
-    if (( $(echo "$difference < $epsilon" | bc -l) )); then
+    if [ "$(echo "$difference < $epsilon" | bc -l)" -eq 1 ]; then
         echo "✅ Тест пройден!"
     else
         echo "❌ Ошибка! Разница $difference превышает порог $epsilon."
