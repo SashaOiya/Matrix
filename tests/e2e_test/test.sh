@@ -22,6 +22,11 @@ for file in "${files[@]}"; do
 
     echo "Определитель матрицы:"
     result=$(../../build/matrix < "$file")  # Запускаем программу и сохраняем результат
+    if [ ! -f "result" ]; then
+        echo "Файл с запуском вычислением определителя не найден! Проверьте сборку проекта"
+        break
+    fi
+
     expected=$(cat "$expected_file")  # Читаем ожидаемый результат
 
     echo "Результат: $result"
