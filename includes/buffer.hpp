@@ -2,6 +2,7 @@
 
 #include <utility>
 
+namespace detail {
 template <typename T>
 class Buffer {
    public:
@@ -94,3 +95,4 @@ class Array : private Buffer<T> {
     iterator end() noexcept { return data_ + size_; }
     const_iterator end() const noexcept { return data_ + size_; }
 };
+}  // namespace detail

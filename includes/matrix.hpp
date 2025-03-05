@@ -8,10 +8,10 @@
 
 template <typename T>
     requires std::is_same_v<T, double>
-class Matrix final : private Array<T> {
+class Matrix final : private detail::Array<T> {
     static constexpr double kEpsilon = 1.0e-9;
-    using Array<T>::data_;
-    using Array<T>::size_;
+    using detail::Array<T>::data_;
+    using detail::Array<T>::size_;
     std::size_t rows_;
     std::size_t cols_;
 
@@ -22,18 +22,18 @@ class Matrix final : private Array<T> {
     };
 
    public:
-    using typename Array<T>::size_type;
-    using Array<T>::iterator;
-    using Array<T>::const_iterator;
-    using Array<T>::begin;
-    using Array<T>::end;
-    using Array<T>::size;
+    using typename detail::Array<T>::size_type;
+    using detail::Array<T>::iterator;
+    using detail::Array<T>::const_iterator;
+    using detail::Array<T>::begin;
+    using detail::Array<T>::end;
+    using detail::Array<T>::size;
 
     Matrix(std::size_t n_rows, std::size_t n_cols)
-        : Array<T>(n_rows * n_cols), rows_(n_rows), cols_(n_cols) {}
+        : detail::Array<T>(n_rows * n_cols), rows_(n_rows), cols_(n_cols) {}
 
     Matrix(std::size_t n_rows, std::size_t n_cols, std::initializer_list<T> l)
-        : Array<T>(n_rows * n_cols), rows_(n_rows), cols_(n_cols) {
+        : detail::Array<T>(n_rows * n_cols), rows_(n_rows), cols_(n_cols) {
         if (l.size() != size()) {
             throw std::invalid_argument("Incorrect initializer list size");
         }
